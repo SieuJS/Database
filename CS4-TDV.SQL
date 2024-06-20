@@ -81,3 +81,4 @@ EXEC USP_GAN_ROLE(STRROLE  => 'GV' /*IN VARCHAR2*/, LOAI  => 'Trưởng đơn v�
 
 EXEC USP_GAN_ROLE(STRROLE  => 'TDV' /*IN VARCHAR2*/, LOAI  => 'Trưởng đơn vị' /*IN VARCHAR2*/)
 
+SELECT * FROM PHANCONG;
