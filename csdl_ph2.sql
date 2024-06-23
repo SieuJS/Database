@@ -3,7 +3,6 @@
 -- 21120321 - Nguyen Van Sieu
 -- 21120565 - Tran Van Thong
 -- 21120416 - Vo Quoc Bao
-conn QLDLNB/admin
 conn sys/123@localhost:1521/xe as sysdba ; 
 ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE ;
 
