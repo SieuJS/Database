@@ -54,10 +54,11 @@ END;
 
 SELECT * FROM PHANCONG;
 
-select * from NHANSU;
+select * from NHANSU WHERE VAITRO = 'Giáo vụ';
 
 SELECT * FROM HOCPHAN;
 
+SELECT * FROM DONVI;
 
 
 
