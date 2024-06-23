@@ -53,3 +53,12 @@ END;
 /
 
 SELECT * FROM PHANCONG;
+
+select * from NHANSU;
+
+SELECT * FROM HOCPHAN;
+
+
+
+
+
