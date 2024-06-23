@@ -196,6 +196,6 @@ BEGIN
 END;
 /
 
--- EXEC USP_XOA_SV ; 
+EXEC USP_XOA_SV ; 
 -- EXEC USP_TAO_SV ;
 

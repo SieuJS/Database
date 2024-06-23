@@ -51,7 +51,7 @@ END;
 
 -- NHANSU (Faculty Head)
 INSERT INTO NHANSU (MANV, HOTEN, PHAI, NGSINH, PHUCAP, DT, VAITRO, MADV, COSO) 
-VALUES (600, 'Trưởng khoa', 'Nam', TO_DATE('1965-01-01', 'YYYY-MM-DD'), 10000000, '0954321098', 'Trưởng khoa', 1001);
+VALUES (600, 'Trưởng khoa', 'Nam', TO_DATE('1965-01-01', 'YYYY-MM-DD'), 10000000, '0954321098', 'Trưởng khoa', 1001, NULL);
 
 UPDATE NhanSu
 SET coso = CASE
@@ -106,7 +106,9 @@ SELECT
     100 + LEVEL,
     30 + LEVEL,
     ROUND(DBMS_RANDOM.VALUE(200, 400) / 100, 2),
-    CASE WHEN MOD(LEVEL, 2) = 0 THEN 'Cơ sở 1' ELSE 'Cơ sở 2'
+    CASE 
+        WHEN MOD(LEVEL, 2) = 0 THEN 'Cơ sở 1' ELSE 'Cơ sở 2' 
+    END
 FROM DUAL
 CONNECT BY LEVEL <= 100;
 
