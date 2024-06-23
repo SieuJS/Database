@@ -1,42 +1,55 @@
-CONN SV701/701@LOCALHOST:1521/XE; 
-alter session set tracefile_identifier = SV3;
+CONN sys/123@LOCALHOST:1521/XE AS SYSDBA; 
 set serveroutput on format wrapped;
 ALTER SESSION SET CURRENT_SCHEMA = QLDLNB; 
 ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE;
 DECLARE
-    STRSQL VARCHAR(100);
-    MAHP_ VARCHAR2(10);
-    MAHP_N NUMBER(5);
-    CUR_USER VARCHAR2(10);
-    LIST_MAHP VARCHAR2(300);
-    PRED VARCHAR2(300);
-    CURSOR CUR IS (
-        SELECT MAHP FROM KHMO 
-        WHERE MACT IN (
-            SELECT MACT FROM SINHVIEN WHERE 'SV'||MASV = 
-            SYS_CONTEXT('USERENV', 'SESSION_USER') 
-        )
-    );
+    -- Variable to hold the start date of the semester
+    start_date DATE ;
+    -- Variable to hold the current date
+    current_date DATE := SYSDATE;
+    -- Variable to hold the difference in days
+    day_difference NUMBER;
+    -- Variable to hold the semester number
+    HK NUMBER;
+    NAM_ NUMBER := 2024;
+    MAHP_ NUMBER :=301;
 BEGIN
-
-    CUR_USER := SYS_CONTEXT('USERENV', 'SESSION_USER');
-
-    OPEN CUR ;
-    LIST_MAHP := ' ';
-    DBMS_OUTPUT.PUT_LINE('LIST_MAHP: ' || LIST_MAHP);
-
-    LOOP 
-        FETCH CUR INTO MAHP_N;
-        EXIT WHEN CUR%NOTFOUND; 
-            IF (LIST_MAHP != ' ') THEN 
-                LIST_MAHP := LIST_MAHP || ','; 
-            END IF;
-            LIST_MAHP := LIST_MAHP || ' ' || MAHP_N ; 
-    END LOOP ; 
-    CLOSE CUR;
-    PRED := ' MAHP IN ('||LIST_MAHP||')';
-    DBMS_OUTPUT.put_line(PRED);
+    -- Fetch the semester number (HK) from the KHMO table
+    dbms_output.enable; 
+    SELECT HK
+    INTO HK
+    FROM KHMO
+    WHERE MAHP = MAHP_ AND NAM = NAM_ AND MACT = 'VP';
+    -- Determine the start date of the semester based on the HK value
+    CASE HK
+        WHEN 1 THEN
+            start_date := TO_DATE('01-01-' || NAM_, 'DD-MM-YYYY');
+        WHEN 2 THEN
+            start_date := TO_DATE('01-05-' || NAM_, 'DD-MM-YYYY');
+        WHEN 3 THEN
+            start_date := TO_DATE('20-06-' || NAM_, 'DD-MM-YYYY');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('NONE');
+            
+    END CASE;
     
-END ;
+    -- Calculate the difference in days betSDASASDASADween the current date and the start date
+    day_difference := current_date - start_date;
+    DBMS_OUTPUT.PUT_LINE(day_difference);
+END;
 /
-SELECT * FROM HOCPHAN WHERE ''|| MAHP IN ('301','302','303');
+DECLARE
+    LAM BOOLEAN;
+BEGIN
+    LAM := IS_VALID_DAY(301,2024,'VP');
+    IF(LAM = TRUE) THEN 
+        
+    DBMS_OUTPUT.PUT_LINE('TRUE');
+    ELSE 
+    DBMS_OUTPUT.PUT_LINE('FALSE');
+
+    END IF;
+END;
+/
+
+SELECT * FROM PHANCONG;
