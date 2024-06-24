@@ -1,58 +1,17 @@
 CONN SYS/123@LOCALHOST:1521/XE AS SYSDBA; 
+alter session set container = CDB$ROOT;
 
 ALTER SESSION SET CURRENT_SCHEMA = QLDLNB ; 
-ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE;
 
-CREATE OR REPLACE PROCEDURE USP_TAO_USR
-AS
+--XOA USR
+DECLARE
     CURSOR CUR IS (
         SELECT
-            MANV
+            'C##NV' ||MANV
         FROM
-            NHANSU
+            QLDLNB.NHANSU
         WHERE
-            'NV' || MANV NOT IN (
-                SELECT USERNAME
-                FROM
-                    ALL_USERS
-        )
-    );
-    STRSQL VARCHAR(2000);
-    USR    VARCHAR2(10);
-BEGIN
-    OPEN CUR;
-    STRSQL := 'ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE';
-    EXECUTE IMMEDIATE(STRSQL);
-    LOOP
-        FETCH CUR INTO USR;
-        EXIT WHEN CUR%NOTFOUND;
-        STRSQL := 'CREATE USER NV'
-                  ||USR
-                  ||' IDENTIFIED BY '
-                  ||USR;
-        EXECUTE IMMEDIATE(STRSQL);
-        STRSQL:= 'GRANT CREATE SESSION TO NV'
-                 || USR;
-        EXECUTE IMMEDIATE(STRSQL);
-    END LOOP;
-
-    STRSQL := 'ALTER SESSION SET "_ORACLE_SCRIPT" = FALSE ';
-    EXECUTE IMMEDIATE(STRSQL);
-    COMMIT;
-    CLOSE CUR;
-END;
-/
-
-
-CREATE OR REPLACE PROCEDURE USP_XOA_USR 
-AS 
-    CURSOR CUR IS (
-        SELECT
-            'NV' ||MANV
-        FROM
-            NHANSU
-        WHERE
-            'NV' || MANV IN (
+            'C##NV' || MANV IN (
                 SELECT
                     USERNAME
                 FROM
@@ -63,21 +22,57 @@ AS
     USR    VARCHAR2(10);            
 BEGIN 
     OPEN CUR;
-    STRSQL := 'ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE';
+        STRSQL := 'alter session set "_ORACLE_SCRIPT" = TRUE';
     EXECUTE IMMEDIATE(STRSQL);
     LOOP
         FETCH CUR INTO USR;
         EXIT WHEN CUR%NOTFOUND;
-        STRSQL := 'DROP USER '|| USR || ' CASCADE';
+        STRSQL := 'DROP USER '|| USR || ' CASCADE' ;
         EXECUTE IMMEDIATE(STRSQL);
     END LOOP;
-
-    STRSQL := 'ALTER SESSION SET "_ORACLE_SCRIPT" = FALSE';
+    COMMIT;
+            STRSQL := 'alter session set "_ORACLE_SCRIPT" = FALSE';
     EXECUTE IMMEDIATE(STRSQL);
+    CLOSE CUR;
+END;
+/
+
+DECLARE
+CURSOR CUR IS (
+        SELECT
+            MANV
+        FROM
+            NHANSU
+        WHERE
+            'C##NV' || MANV NOT IN (
+                SELECT USERNAME
+                FROM
+                    ALL_USERS
+        )
+    );
+    STRSQL VARCHAR(2000);
+    USR    VARCHAR2(10);
+BEGIN
+    OPEN CUR;
+    STRSQL := 'alter session set container = CDB$ROOT';
+    EXECUTE IMMEDIATE(STRSQL);
+    LOOP
+        FETCH CUR INTO USR;
+        EXIT WHEN CUR%NOTFOUND;
+        STRSQL := 'CREATE USER C##NV'
+                  ||USR
+                  ||' IDENTIFIED BY '
+                  ||USR || ' CONTAINER = ALL';
+        EXECUTE IMMEDIATE(STRSQL);
+        STRSQL:= 'GRANT CREATE SESSION TO C##NV'
+                 || USR || ' CONTAINER = ALL';
+        EXECUTE IMMEDIATE(STRSQL);
+    END LOOP;
     COMMIT;
     CLOSE CUR;
 END;
 /
+ALTER SESSION SET CURRENT_SCHEMA = SYS;
 
 CREATE OR REPLACE PROCEDURE USP_GAN_ROLE (
     STRROLE VARCHAR2,
@@ -85,24 +80,20 @@ CREATE OR REPLACE PROCEDURE USP_GAN_ROLE (
 ) AS
     CURSOR CUR IS (
         SELECT
-            'NV'||MANV
+            'C##NV'||MANV
         FROM
-            NHANSU
+            QLDLNB.NHANSU
         WHERE
-            'NV'||MANV IN (
-                SELECT
-                    USERNAME
-                FROM
-                    ALL_USERS
-            )
-            AND  VAITRO = LOAI
+            VAITRO = LOAI
     );
     STRSQL VARCHAR(2000);
     USR    VARCHAR2(10);
 BEGIN
-    STRSQL := 'ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE';
-    EXECUTE IMMEDIATE(STRSQL);
     OPEN CUR;
+    STRSQL := 'alter session set "_ORACLE_SCRIPT" = TRUE';
+    EXECUTE IMMEDIATE(STRSQL);
+    STRSQL := 'alter session set container = CDB$ROOT';
+    EXECUTE IMMEDIATE(STRSQL);    
     LOOP
         FETCH CUR INTO USR;
         EXIT WHEN CUR%NOTFOUND;
@@ -112,11 +103,10 @@ BEGIN
                  ||USR;
         EXECUTE IMMEDIATE (STRSQL);
     END LOOP;
-
+    STRSQL := 'alter session set "_ORACLE_SCRIPT" = FALSE';
+    EXECUTE IMMEDIATE(STRSQL);
     CLOSE CUR;
 END;
 /
 
 
-EXEC USP_XOA_USR ; 
-EXEC USP_TAO_USR ;

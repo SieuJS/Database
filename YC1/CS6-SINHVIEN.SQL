@@ -15,11 +15,11 @@ AS
 BEGIN 
     CUR_USER := SYS_CONTEXT('USERENV', 'SESSION_USER');
     IF CUR_USER = 'SYS' OR CUR_USER = 'QLDLNB' THEN RETURN '';
-    ELSIF (CUR_USER LIKE 'NV%') THEN RETURN '';
-    ELSIF NOT (CUR_USER LIKE 'SV%') THEN 
+    ELSIF (CUR_USER LIKE 'C##NV%') THEN RETURN '';
+    ELSIF NOT (CUR_USER LIKE 'C##SV%') THEN 
     RETURN '1=2';
     END IF ;
-    RETURN ' ''SV''||MASV = '''||CUR_USER||''''; 
+    RETURN ' ''C##SV''||MASV = '''||CUR_USER||''''; 
 END ;
 /
 
@@ -54,7 +54,7 @@ AS
     CURSOR CUR IS (
         SELECT MAHP FROM KHMO 
         WHERE MACT IN (
-            SELECT MACT FROM SINHVIEN WHERE 'SV'||MASV = 
+            SELECT MACT FROM SINHVIEN WHERE 'C##SV'||MASV = 
             SYS_CONTEXT('USERENV', 'SESSION_USER') 
         )
     );
@@ -62,8 +62,8 @@ BEGIN
 
     CUR_USER := SYS_CONTEXT('USERENV', 'SESSION_USER');
     IF CUR_USER = 'SYS' OR CUR_USER = 'QLDLNB' THEN RETURN '';
-    ELSIF (CUR_USER LIKE 'NV%') THEN RETURN '';
-    ELSIF NOT (CUR_USER LIKE 'SV%') THEN 
+    ELSIF (CUR_USER LIKE 'C##NV%') THEN RETURN '';
+    ELSIF NOT (CUR_USER LIKE 'C##SV%') THEN 
     RETURN '1=2';
     END IF ;
     OPEN CUR ;
@@ -93,13 +93,13 @@ AS
 BEGIN
     CUR_USER := SYS_CONTEXT('USERENV', 'SESSION_USER');
     IF CUR_USER = 'SYS' OR CUR_USER = 'QLDLNB' THEN RETURN '';
-    ELSIF (CUR_USER LIKE 'NV%') THEN RETURN '';
-    ELSIF NOT (CUR_USER LIKE 'SV%') THEN 
+    ELSIF (CUR_USER LIKE 'C##NV%') THEN RETURN '';
+    ELSIF NOT (CUR_USER LIKE 'C##SV%') THEN 
     RETURN '1=2';
     END IF ;
     CT := '';
     SELECT MACT INTO CT FROM SINHVIEN WHERE
-     'SV'||MASV = CUR_USER  AND ROWNUM = 1;
+     'C##SV'||MASV = CUR_USER  AND ROWNUM = 1;
     RETURN 'MACT = '''||CT||'''';  
 END ;
 /
@@ -153,11 +153,11 @@ GRANT SELECT ON HOCPHAN TO SV;
 DECLARE
     CURSOR CUR IS (
         SELECT
-            'SV'||MASV
+            'C##SV'||MASV
         FROM
             QLDLNB.SINHVIEN
         WHERE
-            'SV'||MASV IN (
+            'C##SV'||MASV IN (
                 SELECT
                     USERNAME
                 FROM
@@ -174,7 +174,7 @@ BEGIN
         FETCH CUR INTO USR;
         EXIT WHEN CUR%NOTFOUND;
         STRSQL:= 'GRANT '
-                 || 'SV'
+                 || 'SV' 
                  ||' TO '
                  ||USR;
         EXECUTE IMMEDIATE (STRSQL);

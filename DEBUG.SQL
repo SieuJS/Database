@@ -1,65 +1,41 @@
-CONN sys/123@LOCALHOST:1521/XE AS SYSDBA; 
-set serveroutput on format wrapped;
-ALTER SESSION SET CURRENT_SCHEMA = QLDLNB; 
-ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE;
+CONN SYS/123@LOCALHOST:1521/XE AS SYSDBA; 
+ALTER SESSION SET CURRENT_SCHEMA = QLDLNB;
+alter session set container = CDB$ROOT;
 DECLARE
-    -- Variable to hold the start date of the semester
-    start_date DATE ;
-    -- Variable to hold the current date
-    current_date DATE := SYSDATE;
-    -- Variable to hold the difference in days
-    day_difference NUMBER;
-    -- Variable to hold the semester number
-    HK NUMBER;
-    NAM_ NUMBER := 2024;
-    MAHP_ NUMBER :=301;
+CURSOR CUR IS (
+        SELECT
+            MANV
+        FROM
+            NHANSU
+        WHERE
+            'C##NV' || MANV NOT IN (
+                SELECT USERNAME
+                FROM
+                    ALL_USERS
+        )
+    );
+    STRSQL VARCHAR(2000);
+    USR    VARCHAR2(10);
 BEGIN
-    -- Fetch the semester number (HK) from the KHMO table
-    dbms_output.enable; 
-    SELECT HK
-    INTO HK
-    FROM KHMO
-    WHERE MAHP = MAHP_ AND NAM = NAM_ AND MACT = 'VP';
-    -- Determine the start date of the semester based on the HK value
-    CASE HK
-        WHEN 1 THEN
-            start_date := TO_DATE('01-01-' || NAM_, 'DD-MM-YYYY');
-        WHEN 2 THEN
-            start_date := TO_DATE('01-05-' || NAM_, 'DD-MM-YYYY');
-        WHEN 3 THEN
-            start_date := TO_DATE('20-06-' || NAM_, 'DD-MM-YYYY');
-        ELSE
-            DBMS_OUTPUT.PUT_LINE('NONE');
-            
-    END CASE;
-    
-    -- Calculate the difference in days betSDASASDASADween the current date and the start date
-    day_difference := current_date - start_date;
-    DBMS_OUTPUT.PUT_LINE(day_difference);
-END;
-/
-DECLARE
-    LAM BOOLEAN;
-BEGIN
-    LAM := IS_VALID_DAY(301,2024,'VP');
-    IF(LAM = TRUE) THEN 
-        
-    DBMS_OUTPUT.PUT_LINE('TRUE');
-    ELSE 
-    DBMS_OUTPUT.PUT_LINE('FALSE');
-
-    END IF;
+    OPEN CUR;
+    STRSQL := 'alter session set container = CDB$ROOT';
+    EXECUTE IMMEDIATE(STRSQL);
+    LOOP
+        FETCH CUR INTO USR;
+        EXIT WHEN CUR%NOTFOUND;
+        STRSQL := 'CREATE USER C##NV'
+                  ||USR
+                  ||' IDENTIFIED BY '
+                  ||USR || ' CONTAINER = ALL';
+        EXECUTE IMMEDIATE(STRSQL);
+        STRSQL:= 'GRANT CREATE SESSION TO C##NV'
+                 || USR || ' CONTAINER = ALL';
+        EXECUTE IMMEDIATE(STRSQL);
+    END LOOP;
+    COMMIT;
+    CLOSE CUR;
 END;
 /
 
-SELECT * FROM PHANCONG;
 
-select * from NHANSU WHERE VAITRO = 'Giáo vụ';
-
-SELECT * FROM HOCPHAN;
-
-SELECT * FROM DONVI;
-
-
-
-
+SELECT * FROM SINHVIEN;
