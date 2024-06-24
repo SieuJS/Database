@@ -60,7 +60,7 @@ DECLARE
 BEGIN
     -- Call the is_valid_day function to check if the current day is within the valid range
     valid_day := QLDLNB.is_valid_day(:NEW.MAHP, :NEW.NAM, :NEW.MACT);
-    IF :NEW.TH IS NOT NULL OR :NEW.DIEMQT IS NOT NULL OR :NEW.DIEMCK IS NOT NULL OR :NEW.DIEMTK IS NOT NULL THEN
+    IF :NEW.DIEMTH IS NOT NULL OR :NEW.DIEMQT IS NOT NULL OR :NEW.DIEMCK IS NOT NULL OR :NEW.DIEMTK IS NOT NULL THEN
         RETURN ;
     END IF;
     -- If the day is not valid, raise an exception
