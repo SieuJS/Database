@@ -1,5 +1,5 @@
 
-conn sys/123@localhost:1521/xe as sysdba ; 
+conn sys/123@localhost:1521/xepdb1 as sysdba ; 
 ALTER SESSION SET CURRENT_SCHEMA = QLDLNB ; 
 
 

@@ -1,7 +1,6 @@
-CONN SYS/123@LOCALHOST:1521/XE AS SYSDBA; 
+CONN SYS/123@LOCALHOST:1521/XEPDB1 AS SYSDBA; 
 
 ALTER SESSION SET CURRENT_SCHEMA = QLDLNB ; 
-alter session set container = CDB$ROOT;
 
 CREATE OR REPLACE PROCEDURE USP_GAN_ROLE_SV (
     STRROLE VARCHAR2
@@ -9,11 +8,11 @@ CREATE OR REPLACE PROCEDURE USP_GAN_ROLE_SV (
 AS
     CURSOR CUR IS (
         SELECT
-            'C##SV'||MASV
+            'SV'||MASV
         FROM
             QLDLNB.SINHVIEN
         WHERE
-            'C##SV'||MASV IN (
+            'SV'||MASV IN (
                 SELECT
                     USERNAME
                 FROM
@@ -39,15 +38,15 @@ END;
 /
 
 -- XOA SV
-
-DECLARE
+CREATE OR REPLACE PROCEDURE USP_XOA_SV
+AS
     CURSOR CUR IS (
         SELECT
-            'C##SV' ||MASV
+            'SV' ||MASV
         FROM
             QLDLNB.SINHVIEN
         WHERE
-            'C##SV' || MASV IN (
+            'SV' || MASV IN (
                 SELECT
                     USERNAME
                 FROM
@@ -64,7 +63,7 @@ BEGIN
     LOOP
         FETCH CUR INTO USR;
         EXIT WHEN CUR%NOTFOUND;
-        STRSQL := 'DROP USER '|| USR || ' CASCADE';
+        STRSQL := 'DROP USER '|| USR;
         EXECUTE IMMEDIATE(STRSQL);
     END LOOP;
 
@@ -74,15 +73,15 @@ BEGIN
     CLOSE CUR;
 END;
 /
-
-DECLARE
+CREATE OR REPLACE PROCEDURE USP_TAO_SV 
+AS 
     CURSOR CUR IS (
         SELECT
             MASV
         FROM
             QLDLNB.SINHVIEN
         WHERE
-            'C##SV' || MASV NOT IN (
+            'SV' || MASV NOT IN (
                 SELECT USERNAME
                 FROM
                     ALL_USERS
@@ -92,18 +91,16 @@ DECLARE
     USR    VARCHAR2(10);
 BEGIN
     OPEN CUR;
-        STRSQL := 'alter session set container = CDB$ROOT';
-    EXECUTE IMMEDIATE(STRSQL);
     LOOP
         FETCH CUR INTO USR;
         EXIT WHEN CUR%NOTFOUND;
-        STRSQL := 'CREATE USER C##SV'
+        STRSQL := 'CREATE USER SV'
                   ||USR
                   ||' IDENTIFIED BY '
-                  ||USR || ' CONTAINER = ALL';
+                  ||USR;
         EXECUTE IMMEDIATE(STRSQL);
-        STRSQL:= 'GRANT CREATE SESSION TO C##SV'
-                 || USR || ' CONTAINER = ALL';
+        STRSQL:= 'GRANT CREATE SESSION TO SV'
+                 || USR ;
         EXECUTE IMMEDIATE(STRSQL);
     END LOOP;
 
@@ -112,6 +109,6 @@ BEGIN
 END;
 /
 
--- EXEC USP_XOA_SV ; 
--- EXEC USP_TAO_SV ;
+EXEC USP_XOA_SV ; 
+EXEC USP_TAO_SV ;
 

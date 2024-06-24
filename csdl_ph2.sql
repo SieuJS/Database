@@ -3,7 +3,7 @@
 -- 21120321 - Nguyen Van Sieu
 -- 21120565 - Tran Van Thong
 -- 21120416 - Vo Quoc Bao
-conn sys/123@localhost:1521/xe as sysdba ; 
+conn sys/123@localhost:1521/xepdb1 as sysdba ; 
 ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE ;
 
 DROP USER QLDLNB CASCADE;
