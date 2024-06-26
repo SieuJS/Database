@@ -51,7 +51,7 @@ EXCEPTION
         RETURN FALSE; -- An unexpected error occurred
 END;
 /
-
+DROP TRIGGER TRG_DANGKYHP;
 CREATE OR REPLACE TRIGGER TRG_DANGKYHP
 BEFORE INSERT OR UPDATE ON DANGKY
 FOR EACH ROW
@@ -62,9 +62,8 @@ BEGIN
     valid_day := QLDLNB.is_valid_day(:NEW.MAHP, :NEW.NAM, :NEW.MACT);
     IF :NEW.DIEMTH IS NOT NULL OR :NEW.DIEMQT IS NOT NULL OR :NEW.DIEMCK IS NOT NULL OR :NEW.DIEMTK IS NOT NULL THEN
         RETURN ;
-    END IF;
     -- If the day is not valid, raise an exception
-    IF NOT valid_day THEN
+    ELSIF NOT valid_day THEN
         RAISE_APPLICATION_ERROR(-20001, 'Invalid day: Registration is not allowed more than 14 days after the start of the semester.');
     END IF;
 END;
