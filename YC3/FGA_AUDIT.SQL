@@ -44,6 +44,7 @@ BEGIN
         OBJECT_NAME => 'NHANSU',
         POLICY_NAME => 'AUDIT_NHANSU',
         AUDIT_CONDITION => '''NV''||MANV <> SYS_CONTEXT(''USERENV'',''SESSION_USER'') ',
+        AUDIT_COLUMN => 'PHUCAP',
         ENABLE => TRUE,
         STATEMENT_TYPES => 'SELECT'
     );
